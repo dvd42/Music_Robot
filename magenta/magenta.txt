@@ -1,0 +1,7 @@
+CONFIG=<one of 'performance', 'performance_with_dynamics', 'density_conditioned_performance_with_dynamics', 'pitch_conditioned_performance_with_dynamics', or 'multiconditioned_performance_with_dynamics', matching the bundle>
+
+performance_rnn_generate --config='multiconditioned_performance_with_dynamics' --config='multiconditioned_performance_with_dynamics' --bundle_file=/home/diego/Desktop/Universidad/3ro/2do_Semestre/rlp/Music_Robot/magenta/multiconditioned_performance_with_dynamics.mag --output_dir=./outRNN --num_outputs=1 --num_steps=1000 --primer_melody="[60,62,64,65,67,69,71,72]" --output_dir=./outRNN --num_outputs=1 --num_steps=1000 --primer_melody="[60,62,64,65,67,69,71,72]"
+
+
+
+timidity 2018-05-18_154259_1.mid -Ow -o - | lame - -b 64 0AuraLee2.mp3

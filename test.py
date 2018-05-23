@@ -144,7 +144,7 @@ def camera():
 
 
 def forward(pin1, pin2):
-   
+
    GPIO.output(in1, GPIO.LOW)
    GPIO.output(in2, GPIO.HIGH)
    GPIO.output(in3, GPIO.LOW)
@@ -192,14 +192,14 @@ def led_test():
 
 
 
-#ir_sensor(sensor_pin)
-#ir_sensor(sensor_pin1)
+ir_sensor(sensor_pin)
+ir_sensor(sensor_pin1)
 
 #button(button1_pin, "DONT press the RED button")
-#button(button2_pin, "DONT press the other RED button")
+button(button2_pin, "DONT press the other RED button")
 
-#rotary_sensor()
-#touch_sensor()
+rotary_sensor()
+touch_sensor()
 
 #Popen(['mpg123', 'xxi73-z4sq2.mp3', '--loop 100'])
 #forward(sensor_pin, sensor_pin1)
