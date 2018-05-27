@@ -1,4 +1,3 @@
-# import the necessary packages
 from imutils.object_detection import non_max_suppression
 import numpy as np
 import imutils
@@ -12,7 +11,7 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 def process_image(image):
 
-        # boxes = 0
+    # boxes = 0
     # load the image and resize it to (1) reduce detection time
     # and (2) improve detection accuracy
     image = cv2.imread(image)
@@ -29,13 +28,11 @@ def process_image(image):
     pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
 
     # draw the final bounding boxes
-    for (xA, yA, xB, yB) in pick:
-        cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), )
+    #for (xA, yA, xB, yB) in pick:
+    #    cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), )
 
     # show the output images
-    cv2.imshow("After NMS", image)
-    cv2.waitKey(0)
+    #cv2.imshow("After NMS", image)
+    #cv2.waitKey(0)
     return len(pick)
 
-for i in range(10):
-    process_image("{}.png".format(i))

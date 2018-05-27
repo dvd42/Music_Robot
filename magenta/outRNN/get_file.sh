@@ -15,4 +15,5 @@ myfile2="${ADDR[0]}.mp3"
 myfile="${ADDR[0]}.mid"
 
 timidity $mypath$myfile -Ow -o - | lame - -b 64 $mypath$myfile2
-scp $mypath$myfile2 pi@192.168.43.167:rlp/magenta_audio/
+lame --scale 30 $mypath$myfile2 $mypath$myfile2'a'
+scp $mypath$myfile2'a' pi@192.168.1.44:rlp/magenta_audio/
