@@ -27,4 +27,4 @@ def generate_song(decoded_params):
 
 
 if __name__ == "__main__":
-    start("192.168.1.45", 8089)
+    start("192.168.43.86", 8089)

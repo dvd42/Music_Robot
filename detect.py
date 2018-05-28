@@ -28,11 +28,14 @@ def process_image(image):
     pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
 
     # draw the final bounding boxes
-    #for (xA, yA, xB, yB) in pick:
-    #    cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), )
+    for (xA, yA, xB, yB) in pick:
+        cv2.rectangle(image, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
     # show the output images
-    #cv2.imshow("After NMS", image)
-    #cv2.waitKey(0)
+    cv2.imshow("After NMS", image)
+    cv2.waitKey(0)
     return len(pick)
 
+process_image("0.png")
+process_image("1.png")
+process_image("2.png")

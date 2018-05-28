@@ -25,8 +25,8 @@ touch_pin = 25
 # Motor Controller
 in1 = 24
 in2 = 23
-in3 = 16
-in4 = 14
+in4 = 16
+in3 = 14
 en1 = 13
 
 GPIO.setwarnings(False)
@@ -65,7 +65,7 @@ def setup():
 
 def rotate(tf):
 
-    pwm_1.start(80)
+    pwm_1.start(100)
     GPIO.output(in1, GPIO.LOW)
     GPIO.output(in2, GPIO.HIGH)
     GPIO.output(in3, GPIO.HIGH)
@@ -76,7 +76,7 @@ def rotate(tf):
 
 def forward():
 
-    pwm_1.start(80)
+    pwm_1.start(100)
     GPIO.output(in1, GPIO.HIGH)
     GPIO.output(in3, GPIO.HIGH)
     GPIO.output(in2, GPIO.LOW)
@@ -94,7 +94,7 @@ def stop():
 
 def backward(tf):
 
-    pwm_1.start(80)
+    pwm_1.start(100)
     GPIO.output(in1, GPIO.LOW)
     GPIO.output(in3, GPIO.LOW)
     GPIO.output(in2, GPIO.HIGH)
@@ -123,7 +123,7 @@ def rotary_sensor():
 
             sleep(0.01)
 
-    return counter/2
+    return counter/4
 
 
 def reposition():
@@ -136,12 +136,16 @@ def reposition():
     sensor1 = 0
 
     while t.time() - now < 10:
+
         sensor = GPIO.input(sensor_pin)
         sensor1 = GPIO.input(sensor_pin1)
 
-        sleep(0.1)
+        sleep(0.2)
 
-        if sensor or sensor1:
+        print(sensor_pin, sensor)
+        print(sensor_pin1, sensor1)
+
+        if sensor and sensor1:
             backward(2)
             rotate(2.5)
             forward()
@@ -194,7 +198,7 @@ def navigate():
     sensor = 0
     sensor1 = 0
 
-    while not sensor or not sensor1:
+    while not sensor and not sensor1:
         sensor = GPIO.input(sensor_pin)
         sensor1 = GPIO.input(sensor_pin1)
 
@@ -222,8 +226,13 @@ def generate_music(hat_counter):
     now = t.time()
     song = None
     rotary = 0
+    init = t.time()
 
     while True:
+
+        if t.time() - init > 60:
+            close_audio(song)
+            break
 
         touch = GPIO.input(touch_pin)
         button = GPIO.input(button_pin)
@@ -240,7 +249,7 @@ def generate_music(hat_counter):
             scale = list(np.random.randint(0, 3, 12))
             params['scale'] = scale
             client.send_params(params)
-            sleep(2)
+            sleep(0.5)
 
         if len(files) != len(os.listdir("magenta_audio")):
 
@@ -251,6 +260,7 @@ def generate_music(hat_counter):
             files = sorted(os.listdir("magenta_audio"))
 
             song = aplay_audio(os.path.join("magenta_audio", files[-1]))
+            init = t.time()
 
         elif t.time() - now > 18:
             now = t.time()
@@ -258,6 +268,8 @@ def generate_music(hat_counter):
 
         if touch:
             hat_counter += 1
+            init = t.time()
+            sleep(0.5)
 
             close_audio(song)
 
@@ -265,7 +277,9 @@ def generate_music(hat_counter):
                 play_audio("pre_made/hat.mp3")
                 song = aplay_audio(os.path.join("magenta_audio",
                                                 files[-1]))
+
             else:
+                close_audio(song)
                 play_audio("pre_made/hat2.mp3")
                 break
 
@@ -325,8 +339,6 @@ def interact_mode():
 
 def search_mode(camera, button, rotation_count):
 
-    pic = 0
-
     while not button:
 
         button = GPIO.input(button_pin)
@@ -335,9 +347,7 @@ def search_mode(camera, button, rotation_count):
             button = 1
             break
 
-        persons, rotation_count = scan(pic, camera, rotation_count)
-        # TODO: remove this eventually
-        pic += 1
+        persons, rotation_count = scan("front.png", camera, rotation_count)
 
         if persons:
             break
