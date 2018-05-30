@@ -21,7 +21,7 @@ def start(ip, port):
 
 def generate_song(decoded_params):
 
-        os.system("performance_rnn_generate --config='multiconditioned_performance_with_dynamics' --bundle_file=/home/diego/Desktop/Universidad/3ro/2do_Semestre/rlp/Music_Robot/magenta/multiconditioned_performance_with_dynamics.mag --output_dir=./magenta/outRNN --num_outputs=1 --num_steps=" + str(decoded_params['time']) + " --pitch_class_histogram=\"" + str(decoded_params['scale']) + "\" --notes_per_second=" + str(decoded_params['tempo']))
+        os.system("performance_rnn_generate --config='multiconditioned_performance_with_dynamics' --bundle_file=/home/diego/Desktop/Universidad/3ro/2do_Semestre/rlp/Music_Robot/magenta/multiconditioned_performance_with_dynamics.mag --output_dir=./magenta/outRNN --num_outputs=1 --num_steps=" + str(decoded_params['time']) + " --pitch_class_histogram=\"" + str(decoded_params['scale']) + "\" --notes_per_second=" + str(decoded_params['tempo']) + " --primer_midi=./magenta/primer_midi.mid")
         os.system("ls magenta/outRNN | grep .mid >> magenta/outRNN/log.txt")
         os.system("./magenta/outRNN/process_file.sh")
 

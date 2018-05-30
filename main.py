@@ -123,7 +123,7 @@ def rotary_sensor():
 
             sleep(0.01)
 
-    return counter/4
+    return counter/2
 
 
 def reposition():
@@ -142,9 +142,6 @@ def reposition():
 
         sleep(0.2)
 
-        print(sensor_pin, sensor)
-        print(sensor_pin1, sensor1)
-
         if sensor and sensor1:
             backward(2)
             rotate(2.5)
@@ -154,22 +151,24 @@ def reposition():
 
 
 def aplay_audio(audio):
-    player = subprocess.Popen(["omxplayer", audio, "&"], stdin=subprocess.PIPE,
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    player = subprocess.Popen(["omxplayer", "-o", "local", audio, "&"],
+                              stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
 
     return player
 
 
 def play_audio(audio):
-    os.system("omxplayer " + audio)
+    os.system("omxplayer -o local " + audio)
 
 
 def close_audio(audio_process):
 
     try:
         if audio_process is not None:
+            print("Closing audio")
             audio_process.stdin.write("q")
-            sleep(0.5)
+
     except IOError:
         pass
 
@@ -183,7 +182,7 @@ def scan(pic, camera, rotation_count):
 
     if not persons:
         wii = aplay_audio("pre_made/wii.mp3")
-        sleep(2)
+        sleep(1)
         rotate(2)
         rotation_count += 1
 
@@ -198,11 +197,11 @@ def navigate():
     sensor = 0
     sensor1 = 0
 
-    while not sensor and not sensor1:
+    while not (sensor and sensor1):
         sensor = GPIO.input(sensor_pin)
         sensor1 = GPIO.input(sensor_pin1)
 
-        sleep(0.1)
+        sleep(0.2)
 
     stop()
     GPIO.output(green_led_pin, GPIO.LOW)
@@ -222,10 +221,11 @@ def generate_music(hat_counter):
     files = sorted(os.listdir("magenta_audio"))
 
     play_audio("pre_made/thank_you.mp3")
+    play_audio("pre_made/throat.mp3")
 
     now = t.time()
     song = None
-    rotary = 0
+    interaction = 0
     init = t.time()
 
     while True:
@@ -235,25 +235,26 @@ def generate_music(hat_counter):
             break
 
         touch = GPIO.input(touch_pin)
-        button = GPIO.input(button_pin)
 
-        if not rotary:
+        if not interaction:
             tempo = rotary_sensor()
+            button = GPIO.input(button_pin)
 
             if tempo:
                 params['tempo'] = tempo
                 client.send_params(params)
-                rotary = 1
+                interaction = 1
 
-        if button:
-            scale = list(np.random.randint(0, 3, 12))
-            params['scale'] = scale
-            client.send_params(params)
-            sleep(0.5)
+            if button:
+                scale = list(np.random.randint(0, 3, 12))
+                params['scale'] = scale
+                client.send_params(params)
+                sleep(0.5)
+                interaction = 1
 
         if len(files) != len(os.listdir("magenta_audio")):
 
-            rotary = 0
+            interaction = 0
             now = t.time()
             close_audio(song)
 
@@ -262,7 +263,7 @@ def generate_music(hat_counter):
             song = aplay_audio(os.path.join("magenta_audio", files[-1]))
             init = t.time()
 
-        elif t.time() - now > 18:
+        elif t.time() - now > 15:
             now = t.time()
             song = aplay_audio(os.path.join("magenta_audio", files[-1]))
 
@@ -275,12 +276,13 @@ def generate_music(hat_counter):
 
             if hat_counter < 2:
                 play_audio("pre_made/hat.mp3")
-                song = aplay_audio(os.path.join("magenta_audio",
-                                                files[-1]))
+                sleep(0.5)
+                song = aplay_audio(os.path.join("magenta_audio", files[-1]))
+
+                now = t.time()
 
             else:
-                close_audio(song)
-                play_audio("pre_made/hat2.mp3")
+                aplay_audio("pre_made/hat2.mp3")
                 break
 
     return hat_counter
@@ -319,12 +321,12 @@ def interact_mode():
             audios[1] = 0
             now = t.time()
 
-        if t.time() - now > 8 and audios[2]:
+        if t.time() - now > 9 and audios[2]:
             att = aplay_audio("pre_made/attention.mp3")
             audios[2] = 0
             now = t.time()
 
-        if not any(audios) and t.time() - now > 6:
+        if not any(audios) and t.time() - now > 5:
             audios = [1, 1, 1]
 
     close_audio(nose)
@@ -347,7 +349,7 @@ def search_mode(camera, button, rotation_count):
             button = 1
             break
 
-        persons, rotation_count = scan("front.png", camera, rotation_count)
+        persons, rotation_count = scan("front", camera, rotation_count)
 
         if persons:
             break
@@ -408,6 +410,6 @@ if __name__ == "__main__":
         camera.close()
         GPIO.output(red_led_pin, GPIO.LOW)
         GPIO.output(green_led_pin, GPIO.LOW)
+        stop()
         GPIO.cleanup()
-        pwm_1.start(0)
-        exit()
+        os.system("killall python")
